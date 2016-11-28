@@ -45,7 +45,7 @@ def get_led_single(uid):
     cu = get_cursor(conn)
     cu.execute('SELECT * FROM ' + LED_TABLE + ' WHERE uid=' + str(uid))
     info = cu.fetchone()
-    cu.close_all(conn, cu)
+    close_all(conn, cu)
     return info
 
 def get_led_info():

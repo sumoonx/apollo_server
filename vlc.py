@@ -82,19 +82,15 @@ def tx_on(uid):
 
 def tx_on_all():
     infos = sqlite.get_led_info()
-    ser = vserial.open_tx_serial()
     for info in infos:
         uid = info[0]
-        vserial.sett_tx(ser, uid, info[5])
-        vserial.setz_tx(ser, uid, info[1])
-        vserial.on_tx(ser, uid)
-    ser.close()
+        tx_on(uid)
 
 def tx_off(uid):
     info = sqlite.get_led_single(uid)
     if info is not None:
         ser = vserial.open_tx_serial()
-        vserial.off(ser, info[0])
+        vserial.off_tx(ser, info[0])
         ser.close()
     else:
         print('No such uid: %d' % uid)
@@ -106,19 +102,35 @@ def tx_off_all():
         vserial.off_tx(ser, info[0])
     ser.close()
 
+def tx_status(uid):
+    ser = vserial.open_tx_serial()
+    vserial.status_tx(ser, uid)
+    ser.close()
+
 def parse_tx_cmd(argv):
     if len(argv) < 1:
         print('No argument typed for tx command')
         return
     cmd = argv[0]
     if cmd == 'reset':
-        pass
+        tx_reset()
     elif cmd == 'status':
-        pass
+        if len(argv) == 1:
+            infos = sqlite.get_led_info()
+            for info in infos:
+                tx_status(info[0])
+        else:
+            tx_status(int(argv[1]))
     elif cmd == 'on':
-        pass
+        if len(argv) == 1:
+            tx_on_all()
+        else:
+            tx_on(int(argv[1]))
     elif cmd == 'off':
-        pass
+        if len(argv) == 1:
+            tx_off_all()
+        else:
+            tx_off(int(argv[1]))
     else:
         print('Wrong argument for tx command')
 
@@ -236,17 +248,29 @@ def parse_cmd(cmdline):
         print('Wrong command, type help to check supported commands')
 
 def version():
-    print('vlc version:0.0', ', ', 'type help to know more commands')
+    print('vlc version:0.1', ', ', 'type help to know more commands')
+
+def start():
+    print('--------Starting VLC system-------')
+    sqlite.create_led_table()
+    tx_on_all()
+    print('--------VLC system started--------\n')
+
+def exit():
+    print('--------Shutting down VLC system--------')
+    tx_off_all()
+    print('--------VLC system is shutted down------')
 
 def main():
+    start()
     version()
-    sqlite.create_led_table()
     while True:
         cmd = input('>>> ')
         if cmd == 'exit' or cmd == 'quit':
             break;
         else:
             parse_cmd(cmd)
+    exit()
 
 if __name__ == '__main__':
     main()

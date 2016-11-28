@@ -5,15 +5,24 @@ import serial
 import time
 from struct import pack
 
-TX_SERIAL = '/dev/ttyUSB0'
+TX_SERIAL = '/dev/ttyUSB1'
 RX_SERIAL = '/dev/ttyUSB0'
 
-TX_RESET = 1
-TX_ON = 2
-TX_OFF = 3
-TX_SETZ = 4
-TX_SETT = 5
-TX_STATUS = 6
+TX_BEG = b"B"
+TX_END = b"E"
+
+TX_ON = b"1"
+TX_OFF = b"2"
+TX_SETZ = b"3"
+TX_SETT = b"4"
+TX_STATUS = b"5"
+TX_RESET = b"6"
+
+TX_RES_SUCCESS = b"S"
+TX_RES_FAIL = b"F"
+TX_RES_ON = b"1"
+TX_RES_OFF = b"0"
+TX_RES_NUID = b"U"
 
 RX_RESET = 1
 RX_ON = 2
@@ -32,101 +41,151 @@ RES_NOUID = bytes([3])
 def to_bytes(n):
     return pack('B', n)
 
-
 def open_tx_serial():
     ser = serial.Serial(TX_SERIAL)
+    ser.baudrate = 9600
+    ser.timeout = 1.0
     return ser
 
 def reset_tx(ser):
-    ser.write(TX_RESET)
+   ser.write(to_bytes(TX_RESET))
 
 def on_tx(ser, uid):
-    luid = uid & 0xF
-    huid = uid & 0xF0 >> 8
-    ser.write(TX_ON + chr(huid) + chr(luid))
+    luid = uid % 10
+    huid = int(uid / 10)
+    time.sleep(0.01)
+    ser.write(TX_BEG)
+    time.sleep(0.01)
+    ser.write(TX_ON)
+    time.sleep(0.01)
+    ser.write(bytes(str(huid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(luid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(b'1')
+    time.sleep(0.01)
+    ser.write(TX_END)
     ret = ser.read()
     if ret is not None:
-        if ret == RES_OK:
-            print('Transmitter set on success')
-        elif ret == RES_FAIL:
-            print('Transmitter set on failed')
-        elif ret == RES_NOUID:
-            print('Transmitter can not identify uid: %d' % str(uid))
+        if ret == TX_RES_SUCCESS:
+            print('LED %d on success!' % uid)
+        elif ret == TX_RES_FAIL:
+            print('LED %d on failed!' % uid)
+        elif ret == TX_RES_NUID:
+            print('LED %d not found!' % uid)
         else:
-            print('Transmitter error')
+            print('Error ', ret, ' has occured with LED %d!' % uid)
     else:
-        print('Transmiter not response')
+        print('Transmiter no response')
 
 def off_tx(ser, uid):
-    luid = uid & 0xF
-    huid = uid & 0xF0 >> 8
-    ser.write(TX_OFF + chr(huid) + chr(luid))
+    luid = uid % 10
+    huid = int(uid / 10)
+    time.sleep(0.01)
+    ser.write(TX_BEG)
+    time.sleep(0.01)
+    ser.write(TX_OFF)
+    time.sleep(0.01)
+    ser.write(bytes(str(huid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(luid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(b'1')
+    time.sleep(0.01)
+    ser.write(TX_END)
     ret = ser.read()
     if ret is not None:
-        if ret == RES_OK:
-            print('Transmitter set off success')
-        elif ret == RES_FAIL:
-            print('Transmitter set off failed')
-        elif ret == RES_NOUID:
-            print('Transmitter can not identify uid: %d' % str(uid))
+        if ret == TX_RES_SUCCESS:
+            print('LED %d off success!' % uid)
+        elif ret == TX_RES_FAIL:
+            print('LED %d off failed!' % uid)
+        elif ret == TX_RES_NUID:
+            print('LED %d not found!' % uid)
         else:
-            print('Transmitter error')
+            print('Error ', ret, ' has occured with LED %d!' % uid)
     else:
         print('Transmiter not response')
 
 def setz_tx(ser, uid, zid):
-    luid = uid & 0xF
-    huid = uid & 0xF0 >> 8
-    ser.write(TX_SETZ + chr(huid) + chr(luid) + chr(zid))
+    luid = uid % 10
+    huid = int(uid / 10)
+    time.sleep(0.01)
+    ser.write(TX_BEG)
+    time.sleep(0.01)
+    ser.write(TX_SETZ)
+    time.sleep(0.01)
+    ser.write(bytes(str(huid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(luid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(zid), encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(TX_END)
     ret = ser.read()
     if ret is not None:
-        if ret == RES_OK:
-            print('Transmitter set zid success')
-        elif ret == RES_FAIL:
-            print('Transmitter set zid failed')
-        elif ret == RES_NOUID:
-            print('Transmitter can not identify uid: %d' % str(uid))
+        if ret == TX_RES_SUCCESS:
+            print('LED %d set zid success!' % uid)
+        elif ret == TX_RES_FAIL:
+            print('LED %d set zid failed!' % uid)
+        elif ret == TX_RES_NUID:
+            print('LED %d not found!' % uid)
         else:
-            print('Transmitter error')
+            print('Error ', ret, ' has occured with LED %d!' % uid)
     else:
         print('Transmiter not response')
     
 def sett_tx(ser, uid, type):
-    luid = uid & 0xF
-    huid = uid & 0xF0 >> 8
-    ser.write(TX_SETT + chr(huid) + chr(luid) + chr(type))
+    luid = uid % 10
+    huid = int(uid / 10)
+    time.sleep(0.01)
+    ser.write(TX_BEG)
+    time.sleep(0.01)
+    ser.write(TX_SETT)
+    time.sleep(0.01)
+    ser.write(bytes(str(huid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(luid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(type),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(TX_END)
     ret = ser.read()
     if ret is not None:
-        if ret == RES_OK:
-            print('Transmitter set type success')
-        elif ret == RES_FAIL:
-            print('Transmitter set type failed')
-        elif ret == RES_NOUID:
-            print('Transmitter can not identify uid: %d' % str(uid))
+        if ret == TX_RES_SUCCESS:
+            print('LED %d set type success!' % uid)
+        elif ret == TX_RES_FAIL:
+            print('LED %d set type failed!' % uid)
+        elif ret == TX_RES_NUID:
+            print('LED %d not found!' % uid)
         else:
-            print('Transmitter error')
+            print('Error ', ret, ' has occured with LED %d!' % uid)
     else:
         print('Transmiter not response')
 
 def status_tx(ser, uid):
-    luid = uid & 0xF
-    huid = uid & 0xF0 >> 8
-    ser.write(TX_STATUS + chr(huid) + chr(luid))
-    status = int(ser.read())
-    ok = status & 128 >> 7
-    if ok != 0:
-        cnt = status & 127
-        ret = []
-        while cnt > 0:
-           huid = int(ser.read())
-           luid = int(ser.read())
-           uid = huid * 256 + luid
-           ret.append(uid)
-           cnt -= 1
-        return ret
+    luid = uid % 10
+    huid = int(uid / 10)
+    time.sleep(0.01)
+    ser.write(TX_BEG)
+    time.sleep(0.01)
+    ser.write(TX_STATUS)
+    time.sleep(0.01)
+    ser.write(bytes(str(huid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(bytes(str(luid),encoding="utf-8"))
+    time.sleep(0.01)
+    ser.write(b'1')
+    time.sleep(0.01)
+    ser.write(TX_END)
+    status = ser.read()
+    if status == TX_RES_ON:
+        print('LED %d is on' % uid)
+    elif status == TX_RES_OFF:
+        print('LED %d is off' % uid)
+    elif status == TX_RES_NUID:
+        print('LED %d can not be found!', uid)
     else:
-        print('Receiver status request failed')
-        return None
+        print('Receiver status request failed with status: ', status)
 
 def open_rx_serial():
     ser = serial.Serial(RX_SERIAL)
@@ -152,7 +211,7 @@ def on_rx(ser):
 
 def off_rx(ser):
     silence_rx(ser, True)
-    time.sleep(0.1)
+    time.sleep(0.01)
     ser.write(to_bytes(RX_OFF))
     ret = ser.read()
     if ret is not None:
@@ -168,9 +227,9 @@ def off_rx(ser):
 
 def level_rx(ser, level):
     silence_rx(ser, True)
-    time.sleep(0.1)
+    time.sleep(0.01)
     ser.write(to_bytes(RX_LEVEL))
-    time.sleep(0.1)
+    time.sleep(0.01)
     ser.write(to_bytes(level))
     print('level is ' + str(to_bytes(level)))
     ret = ser.read()
@@ -188,7 +247,7 @@ def level_rx(ser, level):
 def silence_rx(ser, shut):
     if shut == True:
         ser.write(to_bytes(RX_SLIENCE))
-        time.sleep(0.1)
+        time.sleep(0.01)
         ser.write(to_bytes(SLIENCE_TRUE))
         ser.reset_input_buffer()
     else:
@@ -198,7 +257,7 @@ def silence_rx(ser, shut):
 
 def status_rx(ser):
     silence_rx(ser, True)
-    time.sleep(0.1)
+    time.sleep(0.01)
     ser.write(to_bytes(RX_STATUS))
     ret = ser.read(2)
     if len(ret) != 2:
