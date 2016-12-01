@@ -5,7 +5,7 @@ import serial
 import time
 from struct import pack
 
-TX_SERIAL = '/dev/ttyUSB1'
+TX_SERIAL = '/dev/ttyUSB0'
 RX_SERIAL = '/dev/ttyUSB0'
 
 TX_BEG = b"B"
@@ -231,7 +231,6 @@ def level_rx(ser, level):
     ser.write(to_bytes(RX_LEVEL))
     time.sleep(0.01)
     ser.write(to_bytes(level))
-    print('level is ' + str(to_bytes(level)))
     ret = ser.read()
     if ret is not None:
         if ret == RES_OK:

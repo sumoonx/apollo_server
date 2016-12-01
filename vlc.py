@@ -187,7 +187,10 @@ def parse_rx_cmd(argv):
     elif cmd in ('silence', 'si'):
         rx_silence(argv[1:])
     elif cmd in ('level', 'lv'):
-        rx_level(argv[1:])
+        if len(argv) == 1:
+            print('Missing argument for level command!')
+        else:
+            rx_level(argv[1:])
     else:
         print('Wrong argument for rx command')
         
@@ -253,12 +256,12 @@ def version():
 def start():
     print('--------Starting VLC system-------')
     sqlite.create_led_table()
-    tx_on_all()
+    #tx_on_all()
     print('--------VLC system started--------\n')
 
 def exit():
     print('--------Shutting down VLC system--------')
-    tx_off_all()
+    #tx_off_all()
     print('--------VLC system is shutted down------')
 
 def main():
