@@ -6,7 +6,7 @@ import time
 from struct import pack
 
 TX_SERIAL = '/dev/ttyUSB0'
-RX_SERIAL = '/dev/ttyUSB0'
+RX_SERIAL = '/dev/ttyUSB1'
 
 TX_BEG = b"B"
 TX_END = b"E"

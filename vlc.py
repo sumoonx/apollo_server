@@ -73,8 +73,8 @@ def tx_on(uid):
     info = sqlite.get_led_single(uid)
     if info is not None:
         ser = vserial.open_tx_serial()
-        vserial.sett_tx(ser, uid, info[5])
-        vserial.setz_tx(ser, uid, info[1])
+        #vserial.sett_tx(ser, uid, info[5])
+        #vserial.setz_tx(ser, uid, info[1])
         vserial.on_tx(ser, uid)
         ser.close()
     else:
@@ -256,12 +256,16 @@ def version():
 def start():
     print('--------Starting VLC system-------')
     sqlite.create_led_table()
-    #tx_on_all()
+    tx_on_all()
+    rx_on()
+    rx_level(['100'])
+    rx_silence('on')
     print('--------VLC system started--------\n')
 
 def exit():
     print('--------Shutting down VLC system--------')
-    #tx_off_all()
+    tx_off_all()
+    #rx_off()
     print('--------VLC system is shutted down------')
 
 def main():
