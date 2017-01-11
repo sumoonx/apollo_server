@@ -258,6 +258,11 @@ def parse_cmd(cmdline):
         rx_silence(['off'])
         os.system('./bin/fingerprint')
         rx_silence(['on'])
+    elif cmd in ('sniff', 'sn'):
+        rx_on()
+        rx_silence(['off'])
+        os.system('./bin/sniff')
+        rx_silence(['on'])
     else:
         print('Wrong command, type help to check supported commands')
 
