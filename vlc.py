@@ -191,6 +191,12 @@ def parse_rx_cmd(argv):
             print('Missing argument for level command!')
         else:
             rx_level(argv[1:])
+    elif cmd in ('catch', 'cat'):
+        rx_on()
+        rx_silence(['off'])
+        os.system('./bin/catch')
+        #time.sleep(1000)
+        rx_silence(['on'])
     else:
         print('Wrong argument for rx command')
         
@@ -247,6 +253,11 @@ def parse_cmd(cmdline):
         help()
     elif cmd in ('clear', 'clc'):
         clear()
+    elif cmd in ('fingerprint', 'fp'):
+        rx_on()
+        rx_silence(['off'])
+        os.system('./bin/fingerprint')
+        rx_silence(['on'])
     else:
         print('Wrong command, type help to check supported commands')
 
@@ -258,14 +269,14 @@ def start():
     sqlite.create_led_table()
     tx_on_all()
     rx_on()
-    rx_level(['100'])
-    rx_silence('on')
+    rx_level(['120'])
+    rx_silence(['on'])
     print('--------VLC system started--------\n')
 
 def exit():
     print('--------Shutting down VLC system--------')
     tx_off_all()
-    #rx_off()
+    rx_off()
     print('--------VLC system is shutted down------')
 
 def main():
