@@ -21,30 +21,30 @@ const static size_t BUF_SIZE = 8 * 1024;
 
 const static double FACT = 4;//7.8125;
 
-const static double RADIUS = 30;
+const static double RADIUS = 12;
 
-const static double X1 = 0;
-const static double Y1 = 0;
-const static double Z1 = 1;
+const static double X1 = 5;
+const static double Y1 = 10;
+const static double Z1 = 225;
 
-const static double X2 = 0;
-const static double Y2 = 0;
-const static double Z2 = 1;
+const static double X2 = 35;
+const static double Y2 = 10;
+const static double Z2 = 225;
 
-const static double X3 = 0;
-const static double Y3 = 0;
-const static double Z3 = 1;
+const static double X3 = 35;
+const static double Y3 = 40;
+const static double Z3 = 225;
 
-const static double X4 = 0;
-const static double Y4 = 0;
-const static double Z4 = 1;
+const static double X4 = 5;
+const static double Y4 = 40;
+const static double Z4 = 225;
 
-const static double P1 = 1;
-const static double P2 = 1;
-const static double P3 = 1;
-const static double P4 = 1;
+const static double P1 = 19000000;
+const static double P2 = 12900000;
+const static double P3 = 14000000;
+const static double P4 = 16000000;
 
-const static int K = 3;
+const static int K = 12;
 
 typedef struct Sample {
         double x, y, z;
@@ -245,7 +245,14 @@ int main(){
 
         int t = find_nearest(sams, online);
 
+        cout << "the nearest sample is " << sams[t].x << " " << sams[t].y << " " << sams[t].z << endl;
+
         vector<int> candidates = get_candidates(sams, sams[t], RADIUS);
+
+        for (size_t i = 0; i < candidates.size(); ++i) {
+                cout << "candidate " << i << " is " << sams[candidates[i]].x << " " << sams[candidates[i]].y << " " << sams[candidates[i]].z << endl;
+        }
+
 
         double onedis[4];
         double onrdis[4];
@@ -255,6 +262,7 @@ int main(){
         onrdis[2] = sqrt(online.rssi[2]/P3);
         onrdis[3] = sqrt(online.rssi[3]/P4);
 
+        int finger_t = t;
         int last_t = t;
         do {
                 last_t = t;
@@ -330,6 +338,20 @@ int main(){
                 ze += (k_coe[i] * sams[candidates[i]].z);
         }
         cout << "The estimated coordinates is " << xe << " " << ye << " " << ze << endl;
+
+
+        cout << "write to the result Y/N?" << endl;
+        char c;
+        cin >> c;
+        if (c != 'Y' && c != 'y') return 0;
+        double x, y, z;
+        cout << "type x y z:" << endl;
+        cin >> x >> y >> z;
+        ofstream fout("./data/result", ios::app);
+        fout << x << " " << y << " " << z << " "
+                << sams[finger_t].x << " " << sams[finger_t].y << " " << sams[finger_t].z << " "
+                << xe << " " << ye << " " << ze << endl;
+        
         return 0;
 }
 
