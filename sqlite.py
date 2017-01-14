@@ -64,7 +64,7 @@ def insert_led(led_info):
 
 def delete_led(uid):
     conn = get_conn(DB_FILE_NAME)
-    conn.execute('DELETE FROM ' + LED_TABLE + ' WHERE uid = (?)', str(uid))
+    conn.execute('DELETE FROM ' + LED_TABLE + ' WHERE uid=' + str(uid))
     conn.commit()
     conn.close()
 

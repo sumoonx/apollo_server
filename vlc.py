@@ -43,7 +43,7 @@ def rmled(uid):
     if len(uid) != 1:
         print('Please input a uid')
         return
-    sqlite.delete_led(uid)
+    sqlite.delete_led(int(uid[0]))
 
 def setled(argv):
     if len(argv) != 3:
@@ -274,7 +274,7 @@ def start():
     sqlite.create_led_table()
     tx_on_all()
     rx_on()
-    rx_level(['120'])
+    rx_level(['130'])
     rx_silence(['on'])
     print('--------VLC system started--------\n')
 

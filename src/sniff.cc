@@ -88,39 +88,73 @@ Sam read_rssi() {
         cout << "----------------------------------------------------" << endl;
         cout << "Totally " << cnt << " bytes of data are received:" << endl;
 
-        int fcnt[5];
-        int sum[5];
-        for (int i = 0; i < 5; ++i) {
-                fcnt[i] = 0;
-                sum[i] = 0;
-        }
+        vector<vector<int>> rssis;
+        vector<int> rsum;
+        vector<double> sdsum;
+        vector<int> rscnt;
 
-        for (int i = 0; i < cnt - 7; ++i) {
+        for (int i = 0; i < 10; ++i) {
+                vector<int> rss;
+                rssis.push_back(rss);
+                rsum.push_back(0);
+                sdsum.push_back(0);
+                rscnt.push_back(0);
+	}
+
+        for (int i = 0; i < cnt - 5; ++i) {
                 cout << buffer[i];
-                if (buffer[i] == HEAD && buffer[i + 7] == TAIL) {
+                if (buffer[i] == HEAD && buffer[i + 5] == TAIL) {
                         int huid = buffer[i + 1] - '0';
                         int luid = buffer[i + 2] - '0';
                         int uid = huid * 10 + luid;
+                        int rssi = buffer[i + 4];
 
                         if (uid < 5 && uid > 0) {
-                                fcnt[uid]++;
-                                sum[uid] += buffer[i + 6];
+                                rssis[uid].push_back(rssi);
                         }
-                        i += 7;
+                        i += 5;
+                }
+        }
+
+        for (int i = 1; i < 5; ++i) {
+                if (!rssis[i].empty()) {
+                        //first data of rssis is always incorrect, so j starts with 1
+                        for (size_t j = 1; j < rssis[i].size(); ++j) {
+                                if (rssis[i][j] > 12 && rssis[i][j] < 225) {
+                                        rsum[i] += rssis[i][j];
+                                        rscnt[i]++;
+                                }
+                        }
+                }
+        }
+
+        for (int i = 1; i < 5; ++i) {
+                if (rscnt[i] != 0) {
+                        double ave = rsum[i] / rscnt[i];
+                        for (size_t j = 1; j < rssis[i].size(); ++j) {
+                                if (rssis[i][j] > 12 && rssis[i][j] < 225) {
+                                        double err = rssis[i][j] - ave;
+                                        sdsum[i] += err * err;
+                                }
+                                
+                        }
                 }
         }
 
         cout << endl;
         for (int i = 1; i < 5; ++i) {
-                if (fcnt[i] != 0) {
+                if (rscnt[i] != 0) {
+                        int fcnt = rscnt[i];
                         cout << "LED(" << i
-                        << ") has fcnt: " << fcnt[i] << 
-                        " and rssi: " << sum[i] * FACT / fcnt[i] << "mV" << endl;
+                        << ") has fcnt: " << fcnt << 
+                        " and rssi: " << rsum[i] * FACT / fcnt << "mV"
+                        << " with variance: " << sqrt(sdsum[i] * FACT / fcnt) << endl;
                         ret.uid.push_back(i);
-                        ret.rssi.push_back(sum[i] * FACT / fcnt[i]);
+                        ret.rssi.push_back(rsum[i] * FACT / fcnt);
                 }
         }
         cout << "----------------------------------------------------" << endl;
+
         ser.close();
         return ret;
 }
