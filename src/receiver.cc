@@ -1,0 +1,107 @@
+#include <unistd.h>
+#include "../include/receiver.h"
+
+RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), variance(0) {
+        //ignore first data
+        double sum = 0;
+        for (size_t i = 1; i < rssis.size(); ++i) {
+                sum += rssis[i];
+        }
+        this->rssi = sum / (rssis.size() - 1);
+
+        double vsum = 0;
+        for (size_t i = 1; i < rssis.size(); ++i) {
+                vsum += (rssis[i] - this->rssi);
+        }
+        this->variance = vsum / (rssis.size() - 1);
+}
+
+const std::string Receiver::PORT = ("/dev/ttyUSB1");
+const double Receiver::FACT = 4.0;
+
+Receiver::Receiver(int timeout, const std::string& port, uint32_t buad_rate) :
+	ser(port, buad_rate, serial::Timeout(timeout, timeout, 0, 0, 0)) {
+	open();
+}
+
+Receiver::~Receiver() {
+	close();
+}
+
+void Receiver::open() {
+        if (ser.isOpen()) ser.close();
+        ser.open();
+	ser.write(&CMD_ON, 1);
+}
+
+void Receiver::close() {
+	if (ser.isOpen()) {
+		ser.write(&CMD_OFF, 1);
+		ser.close();
+	}
+}
+
+void Receiver::silence(bool sile) {
+	ser.write(&CMD_SILENCE, 1);
+	usleep(1000);
+	if (sile) ser.write(&SILENCE_TRUE, 1);
+	else ser.write(&SILENCE_FALSE, 1);
+}
+
+std::vector<Rxdata> Receiver::raw_data() {
+	silence(true);
+
+        uint8_t buffer[BUF_SIZE];
+        for (size_t i = 0; i < BUF_SIZE; ++i)
+                buffer[i] = 0;
+        int cnt = ser.read(buffer, BUF_SIZE);
+
+        std::vector<Rxdata> ret;
+
+        for (int i = 0; i < cnt - 5; ++i) {
+                if (buffer[i] == HEAD && buffer[i + 5] == TAIL) {
+                        int huid = buffer[i + 1] - '0';
+                        int luid = buffer[i + 2] - '0';
+                        int uid = huid * 10 + luid;
+                        int cnt = buffer[i + 3];
+                        int rssi = buffer[i + 4];
+
+                        Rxdata data = {uid, cnt, rssi};
+                        ret.push_back(data);
+                }
+        }
+
+	silence(false);
+        return ret;
+}
+
+std::vector<Rxdata> Receiver::filtered_data() {
+        std::vector<Rxdata> data;
+        return data;
+}
+
+std::vector<RssiInfo> Receiver::get_rssi() {
+        std::vector<RssiInfo> ret;
+
+        std::vector<Rxdata> data = filtered_data();
+        std::vector<std::vector<double>> vrssi;
+
+	for (int i = 0; i <= 10; ++i) {
+                std::vector<double> drssi;
+                vrssi.push_back(drssi);
+        }
+
+        for (size_t i = 0; i < data.size(); ++i) {
+                vrssi[data[i].uid].push_back(data[i].rssi * FACT);
+        }
+
+        for (size_t i = 1; i < vrssi.size(); ++i) {
+                if (!vrssi[i].empty()) {
+                        RssiInfo rssi_info = RssiInfo(i, vrssi[i]);
+                        ret.push_back(rssi_info);
+                }
+        }
+
+        return ret;
+
+}
