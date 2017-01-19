@@ -22,9 +22,11 @@ private:
 	void read_rssi();
 	std::vector<double> rough_distance(const std::vector<double>& rssis) const;
 	int find_nearest() const;
-	std::vector<int> get_candidates(int nearest) const;
+	void pick_candidates(int nearest);
 	void adjust_distance(int nearest);
-	void least_error();
+	int least_error();
+        void genertate_coeffs();
+        void esti_location();
 
 public:
 	const static char FINGERPRINT[100];
@@ -33,8 +35,11 @@ public:
 
 private:
 	std::vector<Sample> samples;
+        std::vector<int> candidates;
 	std::vector<double> rssis;
 	std::vector<double> rough_dists;
 	std::vector<double> esti_dists;
 	std::vector<double> errors;
+        std::vector<double> coeffs;
+        double xe, ye, ze;
 };

@@ -3,17 +3,19 @@
 #include <string>
 #include <cstdio>
 #include <iostream>
+#include <cmath>
 
 #include "../include/algorithm.h"
 
 double Algorithm::distance(const std::vector<double>& v1, const std::vector<double>& v2) {
+	if (v1.empty()) return 0;
 	int len = v1.size();
         double ret = 0;
         for (int i = 0; i < len; ++i) {
                 double s = v1[i] - v2[i];
                 ret += s * s;
         }
-        return ret / len;
+        return sqrt(ret) / len;
 
 }
 
@@ -21,7 +23,7 @@ double Algorithm::distance(double x1, double y1, double z1, double x2, double y2
         double d1 = x1 - x2;
         double d2 = y1 - y2;
         double d3 = z1 - z2;
-        return d1 * d1 + d2 * d2 + d3 * d3;
+        return sqrt(d1 * d1 + d2 * d2 + d3 * d3);
 }
 
 

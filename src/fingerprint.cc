@@ -58,14 +58,14 @@ void read_rssi() {
                         int uid = huid * 10 + luid;
                         int rssi = buffer[i + 4];
 
-                        if (uid < 5 && uid > 0) {
+                        if (uid < 10 && uid > 0) {
                                 rssis[uid].push_back(rssi);
                         }
                         i += 5;
                 }
         }
 
-        for (int i = 1; i < 5; ++i) {
+        for (int i = 1; i < 10; ++i) {
                 if (!rssis[i].empty()) {
                         //first data of rssis is always incorrect, so j starts with 1
                         for (size_t j = 1; j < rssis[i].size(); ++j) {
@@ -77,7 +77,7 @@ void read_rssi() {
                 }
         }
 
-        for (int i = 1; i < 5; ++i) {
+        for (int i = 1; i < 10; ++i) {
                 if (rscnt[i] != 0) {
                         double ave = rsum[i] / rscnt[i];
                         for (size_t j = 1; j < rssis[i].size(); ++j) {
@@ -91,7 +91,7 @@ void read_rssi() {
         }
 
         cout << endl;
-        for (int i = 1; i < 5; ++i) {
+        for (int i = 1; i < 10; ++i) {
                 if (rscnt[i] != 0) {
                         int fcnt = rscnt[i];
                         cout << "LED(" << i
@@ -111,7 +111,7 @@ void read_rssi() {
                 cin >> x >> y >> z;
                 ofstream fout(FINGERPRINT, ios::app);
                 fout << x << " " << y << " " << z;
-                for (int i = 1; i < 5; ++i) {
+                for (int i = 1; i < 10; ++i) {
                         double rssi = 0;
                         if(rscnt[i] != 0)
                                 rssi = rsum[i] * FACT / rscnt[i];
