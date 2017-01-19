@@ -1,7 +1,7 @@
 #include <unistd.h>
 #include "../include/receiver.h"
 
-RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), variance(0) {
+RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), variance(0), cnt(0) {
         //ignore first data
         if (rssis.size() <= 1) return;
         double sum = 0;
@@ -15,6 +15,7 @@ RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), vari
                 vsum += (rssis[i] - this->rssi);
         }
         this->variance = vsum / (rssis.size() - 1);
+	this->cnt = rssis.size() - 1;
 }
 
 const std::string Receiver::PORT = ("/dev/ttyUSB1");

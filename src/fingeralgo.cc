@@ -13,8 +13,21 @@ void FingerAlgo::prepare() {
 	load_fingerprint();
 }
 
-Location FingerAlgo::do_work(const std::vector<RssiInfo>& rssi_infos) const {
-	return Location{time_stamp(),0,0,0};
+Location FingerAlgo::do_work(const std::vector<RssiInfo>& rssi_infos) {
+	read_rssi();
+	int t = find_nearest();
+	pick_candidates(t);
+
+	int last_t;
+	do {
+		last_t = t;
+		adjust_distance(last_t);
+		t = least_error();
+	}while (last_t != t);
+
+	generate_coeffs();
+	esti_location();
+	return Location{time_stamp(), this->xe, this->ye, this->ze};
 }
 
 void FingerAlgo::load_fingerprint() {
@@ -116,7 +129,7 @@ int FingerAlgo::least_error() {
 	return ret;
 }
 
-void FingerAlgo::genertate_coeffs() {
+void FingerAlgo::generate_coeffs() {
 	double sum = 0;
 	std::vector<double> temps;
 	for (auto error : this->errors) {

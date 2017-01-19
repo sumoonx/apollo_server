@@ -15,17 +15,17 @@ class FingerAlgo : public Algorithm {
 public:
 	~FingerAlgo();
 	void prepare() override;
-	Location do_work(const std::vector<RssiInfo>& rssi_infos) const override;
+	Location do_work(const std::vector<RssiInfo>& rssi_infos) override;
 
 private:
 	void load_fingerprint();
-	void read_rssi();
-	std::vector<double> rough_distance(const std::vector<double>& rssis) const;
-	int find_nearest() const;
+        void read_rssi();       //read rssis from std::cin and initlize rough_dists
+	std::vector<double> rough_distance(const std::vector<double>& rssis) const;     //generate rough distances from given rssis
+	int find_nearest() const;       //find index of nearest Sample
 	void pick_candidates(int nearest);
 	void adjust_distance(int nearest);
 	int least_error();
-        void genertate_coeffs();
+        void generate_coeffs();
         void esti_location();
 
 public:

@@ -7,6 +7,8 @@
 
 #include "../include/algorithm.h"
 
+Algorithm::~Algorithm() {}
+
 double Algorithm::distance(const std::vector<double>& v1, const std::vector<double>& v2) {
 	if (v1.empty()) return 0;
 	int len = v1.size();

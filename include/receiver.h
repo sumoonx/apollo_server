@@ -20,6 +20,7 @@ public:
 	int uid;
 	double rssi;
 	double variance;
+	int cnt;
 };
 
 class Receiver {

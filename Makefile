@@ -19,7 +19,7 @@ CFLAGS = -g
 CXX = g++
 CXXFLAGS = -g -Wall -std=c++11 -Wno-unused-but-set-variable -I${DIR_SRC}
 
-CAT_OBJ = ${DIR_OBJ}/catch.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
+CAT_OBJ = ${DIR_OBJ}/catch.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
 ${DIR_BIN}/catch:${CAT_OBJ}
 	$(CXX) ${CXXFLAGS} $(CAT_OBJ) -o $@
 

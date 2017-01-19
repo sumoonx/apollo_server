@@ -25,8 +25,9 @@ public:
 	static double distance(const std::vector<double>& v1, const std::vector<double>& v2);
 	static double distance(double x1, double y1, double z1, double x2, double y2, double z2);
 
+        virtual ~Algorithm();
         virtual void prepare();
-        virtual Location do_work(const std::vector<RssiInfo>& rssi_infos) const = 0;
+        virtual Location do_work(const std::vector<RssiInfo>& rssi_infos)  = 0;
 
 protected:
         long long time_stamp() const;
