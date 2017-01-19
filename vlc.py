@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 import os
@@ -9,14 +9,14 @@ import vserial
 
 class TxNode(object):
     'Tx node infos'
-    def __init__ (self, uid=0, zid=0, x=0, y=0, z=0, type=0):
+    def __init__ (self, uid=0, zid=0, x=0, y=0, z=0, type=0, P0=0):
         pass
 
 def lsled():
     'list all led infos'
     infos = sqlite.get_led_info()
     for info in infos:
-        print('uid: %d, zid: %d, (%.2f, %.2f, %.2f), type: %d' % info)
+        print('uid: %d, zid: %d, (%.2f, %.2f, %.2f), type: %d, P0: %.2f' % info)
 
 def glsled(argv):
     'print the led info with the given uid'
@@ -27,16 +27,16 @@ def glsled(argv):
     infos = sqlite.get_led_info()
     for info in infos:
         if info[0] is uid:
-            print('uid: %d, zid: %d, (%.2f, %.2f, %.2f), type: %d' % info)
+            print('uid: %d, zid: %d, (%.2f, %.2f, %.2f), type: %d, P0: %.2f' % info)
 
 def addled(argv):
     'add a led configuration'
-    if len(argv) < 6:
+    if len(argv) < 7:
         print('Too less arguments')
-    elif len(argv) > 6:
+    elif len(argv) > 7:
         print('Too many arguments')
     else:
-        tx_node = (int(argv[0]), int(argv[1]), float(argv[2]), float(argv[3]), float(argv[4]), int(argv[5]))
+        tx_node = (int(argv[0]), int(argv[1]), float(argv[2]), float(argv[3]), float(argv[4]), int(argv[5]), float(argv[6]))
         sqlite.insert_led(tx_node)
 
 def rmled(uid):
@@ -52,7 +52,10 @@ def setled(argv):
     uid = argv[0]
     col = argv[1]
     value = argv[2]
-    sqlite.update_led(uid, col, value)
+    if col in ('x', 'y', 'z', 'zid', 'type', 'P0'):
+        sqlite.update_led(uid, col, value)
+    else:
+        print('Wrong argument for col')
 
 def ldconf(argv):
     if len(argv) > 1:
@@ -274,7 +277,7 @@ def start():
     sqlite.create_led_table()
     tx_on_all()
     rx_on()
-    rx_level(['130'])
+    rx_level(['120'])
     rx_silence(['on'])
     print('--------VLC system started--------\n')
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -35,20 +37,22 @@ public:
 	const static uint32_t BUAD_RATE = 115200;
 	const static int TIMEOUT = 1000;
 
-	const uint8_t CMD_ON = 2;
-	const uint8_t CMD_OFF = 3;
-	const uint8_t CMD_SILENCE = 5;
-	const uint8_t CMD_LEVEL = 6;
+	const static uint8_t CMD_ON = 2;
+	const static uint8_t CMD_OFF = 3;
+	const static uint8_t CMD_SILENCE = 5;
+	const static uint8_t CMD_LEVEL = 6;
 
-	const uint8_t SILENCE_TRUE = 1;
-	const uint8_t SILENCE_FALSE = 2;
+	const static uint8_t SILENCE_TRUE = 1;
+	const static uint8_t SILENCE_FALSE = 2;
 
 	const static uint8_t HEAD = 0xCA;
 	const static uint8_t TAIL = 0xFE;
 
-	const static size_t BUF_SIZE = 8 * 1024;
+	const static size_t BUF_SIZE = 256 * 1024;
 
 	const static double FACT;
+
+	const static int MAX_UID = 9;
 
 
 private:

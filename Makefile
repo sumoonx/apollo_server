@@ -3,7 +3,7 @@ DIR_SRC = ./src
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
 
-all : ${DIR_BIN}/catch ${DIR_BIN}/fingerprint ${DIR_BIN}/sniff ${DIR_BIN}/recv
+all : ${DIR_BIN}/catch ${DIR_BIN}/fingerprint ${DIR_BIN}/sniff ${DIR_BIN}/recv ${DIR_BIN}/algo
 .PHONY: clean
 
 SRC = $(wildcard ${DIR_SRC}/*.cc)
@@ -34,6 +34,10 @@ ${DIR_BIN}/sniff:${SNI_OBJ}
 RECV_OBJ = ${DIR_OBJ}/recv.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
 ${DIR_BIN}/recv:${RECV_OBJ}
 	$(CXX) ${CXXFLAGS} $(RECV_OBJ) -o $@
+
+ALGO_OBJ = ${DIR_OBJ}/algo.o ${DIR_OBJ}/algorithm.o ${DIR_OBJ}/fingeralgo.o
+${DIR_BIN}/algo:${ALGO_OBJ}
+	$(CXX) ${CXXFLAGS} $(ALGO_OBJ) -lsqlite3 -o $@
 
 ${DIR_OBJ}/%.o:${DIR_SRC}/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@

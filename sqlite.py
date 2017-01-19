@@ -1,10 +1,10 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding=utf-8
 
 import sqlite3
 import os
 
-DB_FILE_NAME = '/home/jeremy/workspace/location/.data.db'
+DB_FILE_NAME = os.path.abspath('./.data.db')
 
 LED_TABLE = 'led_info'
 
@@ -30,7 +30,8 @@ def create_led_table():
                  x float, \
                  y float, \
                  z float, \
-                 type integer)')
+                 type integer, \
+                 P0 float)')
 
 def close_all(conn, cu):
     try:
@@ -58,7 +59,7 @@ def get_led_info():
 
 def insert_led(led_info):
     conn = get_conn(DB_FILE_NAME)
-    conn.execute('INSERT INTO ' + LED_TABLE + ' values (?,?,?,?,?,?)', led_info)
+    conn.execute('INSERT INTO ' + LED_TABLE + ' values (?,?,?,?,?,?,?)', led_info)
     conn.commit()
     conn.close()
 

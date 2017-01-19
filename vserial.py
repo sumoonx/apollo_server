@@ -246,12 +246,12 @@ def level_rx(ser, level):
 def silence_rx(ser, shut):
     if shut == True:
         ser.write(to_bytes(RX_SLIENCE))
-        time.sleep(0.01)
+        #time.sleep(0.01)
         ser.write(to_bytes(SLIENCE_TRUE))
         ser.reset_input_buffer()
     else:
         ser.write(to_bytes(RX_SLIENCE))
-        time.sleep(0.01)
+        #time.sleep(0.01)
         ser.write(to_bytes(SLIENCE_FALSE))
 
 def status_rx(ser):
