@@ -3,7 +3,7 @@ DIR_SRC = ./src
 DIR_OBJ = ./obj
 DIR_BIN = ./bin
 
-all : ${DIR_BIN}/catch ${DIR_BIN}/fingerprint ${DIR_BIN}/sniff ${DIR_BIN}/recv ${DIR_BIN}/algo
+all : ${DIR_BIN}/catch ${DIR_BIN}/fingerprint ${DIR_BIN}/sniff ${DIR_BIN}/recv ${DIR_BIN}/algo ${DIR_BIN}/fer
 .PHONY: clean
 
 SRC = $(wildcard ${DIR_SRC}/*.cc)
@@ -23,13 +23,13 @@ CAT_OBJ = ${DIR_OBJ}/catch.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o
 ${DIR_BIN}/catch:${CAT_OBJ}
 	$(CXX) ${CXXFLAGS} $(CAT_OBJ) -o $@
 
-FP_OBJ = ${DIR_OBJ}/fingerprint.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
+FP_OBJ = ${DIR_OBJ}/fingerprint.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
 ${DIR_BIN}/fingerprint:${FP_OBJ}
 	$(CXX) ${CXXFLAGS} $(FP_OBJ) -o $@
 
-SNI_OBJ = ${DIR_OBJ}/sniff.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
+SNI_OBJ = ${DIR_OBJ}/sniff.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/algorithm.o ${DIR_OBJ}/fingeralgo.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
 ${DIR_BIN}/sniff:${SNI_OBJ}
-	$(CXX) ${CXXFLAGS} $(SNI_OBJ) -o $@
+	$(CXX) ${CXXFLAGS} $(SNI_OBJ) -lsqlite3 -o $@
 
 RECV_OBJ = ${DIR_OBJ}/recv.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
 ${DIR_BIN}/recv:${RECV_OBJ}
@@ -38,6 +38,10 @@ ${DIR_BIN}/recv:${RECV_OBJ}
 ALGO_OBJ = ${DIR_OBJ}/algo.o ${DIR_OBJ}/algorithm.o ${DIR_OBJ}/fingeralgo.o
 ${DIR_BIN}/algo:${ALGO_OBJ}
 	$(CXX) ${CXXFLAGS} $(ALGO_OBJ) -lsqlite3 -o $@
+
+FER_OBJ = ${DIR_OBJ}/fer.o ${DIR_OBJ}/receiver.o ${DIR_OBJ}/list_ports_linux.o ${DIR_OBJ}/serial.o ${DIR_OBJ}/unix.o
+${DIR_BIN}/fer:${FER_OBJ}
+	$(CXX) ${CXXFLAGS} $(FER_OBJ) -o $@
 
 ${DIR_OBJ}/%.o:${DIR_SRC}/%.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@

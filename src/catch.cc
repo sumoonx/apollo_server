@@ -13,7 +13,7 @@ int main(){
 
         vector<RssiInfo> rssi_infos = receiver.get_rssi();
         for (auto rssi_info : rssi_infos) {
-                cout << "LED(" << rssi_info.uid << " has cnt " << rssi_info.cnt << " and rssi " << rssi_info.rssi
+                cout << "LED(" << rssi_info.uid << ") has cnt " << rssi_info.cnt << " and rssi " << rssi_info.rssi
                 << "mV with variance " << rssi_info.variance << endl;
         }
 
@@ -21,4 +21,3 @@ int main(){
 
         return 0;
 }
-

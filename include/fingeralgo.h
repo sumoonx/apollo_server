@@ -16,6 +16,7 @@ public:
 	~FingerAlgo();
 	void prepare() override;
 	Location do_work(const std::vector<RssiInfo>& rssi_infos) override;
+	std::vector<Location> debug(const std::vector<RssiInfo> rssi_infos);
 
 private:
 	void load_fingerprint();
@@ -24,8 +25,9 @@ private:
 	int find_nearest() const;       //find index of nearest Sample
 	void pick_candidates(int nearest);
 	void adjust_distance(int nearest);
+	void sort_candidates(std::vector<double>& errors);
 	int least_error();
-        void generate_coeffs();
+        void generate_coeffs(const std::vector<double>& errors);
         void esti_location();
 
 public:

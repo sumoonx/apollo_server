@@ -25,9 +25,50 @@ Location FingerAlgo::do_work(const std::vector<RssiInfo>& rssi_infos) {
 		t = least_error();
 	}while (last_t != t);
 
-	generate_coeffs();
+	sort_candidates(this->errors);
+	generate_coeffs(this->errors);
 	esti_location();
 	return Location{time_stamp(), this->xe, this->ye, this->ze};
+}
+
+
+std::vector<Location> FingerAlgo::debug(const std::vector<RssiInfo> rssi_infos) {
+	std::vector<Location> ret;
+
+	read_rssi();
+	long long timestamp = Algorithm::time_stamp();
+
+	int t = find_nearest();
+	pick_candidates(t);
+	const Sample& sam = this->samples[t];
+	ret.push_back(Location{timestamp, sam.x, sam.y, sam.z});
+
+	std::vector<double> dist_errors;
+	for (auto index : candidates) {
+		const Sample& sam = this->samples[index];
+		double dist = Algorithm::distance(this->rssis, sam.rssis);
+		dist_errors.push_back(dist);
+	}
+	
+	sort_candidates(dist_errors);
+	generate_coeffs(dist_errors);
+	esti_location();
+
+	ret.push_back(Location{timestamp, this->xe, this->ye, this->ze});
+
+	int last_t;
+	do {
+		last_t = t;
+		adjust_distance(last_t);
+		t = least_error();
+	}while (last_t != t);
+
+	sort_candidates(this->errors);
+	generate_coeffs(this->errors);
+	esti_location();
+
+	ret.push_back(Location{timestamp, this->xe, this->ye, this->ze});
+	return ret;
 }
 
 void FingerAlgo::load_fingerprint() {
@@ -111,6 +152,25 @@ void FingerAlgo::adjust_distance(int nearest) {
 	}
 }
 
+void FingerAlgo::sort_candidates(std::vector<double>& errors) {
+	for (size_t i = 1; i < errors.size(); ++i) {
+		if (errors[i] < errors[i - 1]) {
+			int j = i - 1;
+			double tmp = errors[i];
+			int index = this->candidates[i];
+			errors[i] = errors[i - 1];
+			this->candidates[i] = this->candidates[i - 1];
+			while (tmp < errors[j]) {
+				errors[j + 1] = errors[j];
+				this->candidates[j + 1] = this->candidates[j];
+				j--;
+			}
+			errors[j + 1] = tmp;
+			this->candidates[j + 1] = index;
+		}
+	}
+}
+
 int FingerAlgo::least_error() {
 	this->errors.clear();
 	for (auto index : candidates) {
@@ -129,18 +189,18 @@ int FingerAlgo::least_error() {
 	return ret;
 }
 
-void FingerAlgo::generate_coeffs() {
+void FingerAlgo::generate_coeffs(const std::vector<double>& errors) {
 	double sum = 0;
 	std::vector<double> temps;
-	for (auto error : this->errors) {
-		double temp = 1 / error;
+	for (size_t i = 0; i < FingerAlgo::K; ++i) {
+		double temp = 1 / errors[i];
 		sum += temp;
 		temps.push_back(temp);
 	}
 
 	this->coeffs.clear();
-	for (auto temp : temps) {
-		this->coeffs.push_back(temp / sum);
+	for (size_t i = 0; i < FingerAlgo::K; ++i) {
+		this->coeffs.push_back(temps[i] / sum);
 	}
 }
 

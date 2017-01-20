@@ -12,7 +12,8 @@ RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), vari
 
         double vsum = 0;
         for (size_t i = 1; i < rssis.size(); ++i) {
-                vsum += (rssis[i] - this->rssi);
+		double error = rssis[i] - this->rssi;
+                vsum += error * error;
         }
         this->variance = vsum / (rssis.size() - 1);
 	this->cnt = rssis.size() - 1;
@@ -109,10 +110,8 @@ std::vector<RssiInfo> Receiver::get_rssi() {
         }
 
         for (size_t i = 1; i < vrssi.size(); ++i) {
-                if (!vrssi[i].empty()) {
-                        RssiInfo rssi_info = RssiInfo(i, vrssi[i]);
-                        ret.push_back(rssi_info);
-                }
+		RssiInfo rssi_info = RssiInfo(i, vrssi[i]);
+		ret.push_back(rssi_info);
         }
 
         return ret;
