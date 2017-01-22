@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 		sscanf(argv[1], "%d", &uid);
 	}
 	
-	Receiver receiver(1000);
+	Receiver receiver(10000);
 	receiver.open();
 
 	vector<Rxdata> rx_data = receiver.raw_data();

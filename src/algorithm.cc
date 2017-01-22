@@ -7,14 +7,21 @@
 
 #include "../include/algorithm.h"
 
+const double Algorithm::EPS = 0.000000000000000000000001;
+
 Algorithm::~Algorithm() {}
 
 double Algorithm::distance(const std::vector<double>& v1, const std::vector<double>& v2) {
-	if (v1.empty()) return 0;
+	if (v1.empty())	return EPS;
 	int len = v1.size();
         double ret = 0;
         for (int i = 0; i < len; ++i) {
                 double s = v1[i] - v2[i];
+		/*
+		if (v1[i] <= EPS || v2[i] <= EPS) {
+			s = EPS;
+		}
+		*/
                 ret += s * s;
         }
         return sqrt(ret) / len;
@@ -55,14 +62,14 @@ void Algorithm::load_ledinfo() {
 	char dbname[255] = ".data.db";
 	int rc = sqlite3_open(dbname, &db);
 	if (rc == SQLITE_OK) {
-		char sql[256] = "select * from led_info";
+		char sql[256] = "select * from led_info order by uid";
 		char** p_result;
 		int n_row;
 		int n_col;
 		rc = sqlite3_get_table(db, sql, &p_result, &n_row, &n_col, NULL);
 		if (rc == SQLITE_OK) {
 			if (n_row >= 1) {
-				for (int i = 1; i < n_row; ++i) {
+				for (int i = 1; i <= n_row; ++i) {
 					int uid, zid, type;
 					double x, y, z, P0;
 					sscanf(p_result[i * 7 + 0], "%d", &uid);

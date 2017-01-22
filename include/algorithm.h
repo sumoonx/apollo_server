@@ -39,6 +39,7 @@ private:
 
 public:
         const static int MAX_UID = 9;
+	const static double EPS;
 
 private:
         std::vector<LedInfo> ledinfos;

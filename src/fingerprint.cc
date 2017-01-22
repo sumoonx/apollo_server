@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
 	cout << "start recording fingerprint from (" << x_beg << ", " << y_beg << ", " << z_beg << ")"
 		<< " with xy step of " << step << " and z step of " << ZSTEP << endl;
 
-        for (double z = z_beg; z <= z_end; z += ZSTEP) {
+        for (double z = z_end; z >= z_beg; z -= ZSTEP) {
 		for (double y = y_beg; y <= y_end; y += step) {
                         for (double x = x_beg; x <= x_end; x += step) {
 				read_rssi(x, y, z);

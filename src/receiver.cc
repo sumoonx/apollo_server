@@ -3,7 +3,7 @@
 
 RssiInfo::RssiInfo(int uid, std::vector<double> rssis) : uid(uid), rssi(0), variance(0), cnt(0) {
         //ignore first data
-        if (rssis.size() <= 1) return;
+        if (rssis.size() < 8) return;
         double sum = 0;
         for (size_t i = 1; i < rssis.size(); ++i) {
                 sum += rssis[i];
