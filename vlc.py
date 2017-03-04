@@ -117,7 +117,7 @@ def parse_tx_cmd(argv):
     cmd = argv[0]
     if cmd == 'reset':
         tx_reset()
-    elif cmd == 'status':
+    elif cmd in ('status', 'st'):
         if len(argv) == 1:
             infos = sqlite.get_led_info()
             for info in infos:
@@ -199,6 +199,16 @@ def parse_rx_cmd(argv):
         rx_silence(['off'])
         os.system('./bin/catch')
         #time.sleep(1000)
+        rx_silence(['on'])
+    elif cmd in ('fer'):
+        rx_on()
+        rx_silence(['off'])
+        os.system('./bin/fer ' + argv[1])
+        rx_silence(['on'])
+    elif cmd in ('sniff', 'sn'):
+        rx_on()
+        rx_silence(['off'])
+        os.system('./bin/sniff')
         rx_silence(['on'])
     else:
         print('Wrong argument for rx command')
